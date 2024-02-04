@@ -144,6 +144,7 @@ import {
                     onPress={() => toogleSearch(!showSearch)}
                     style={{ backgroundColor: "white" }}
                     className="rounded-full p-3 m-1"
+                    testID="search-button-icon"
                   >
                     <MagnifyingGlassCircleIcon size={30} color={"black"} />
                   </TouchableOpacity>

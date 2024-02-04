@@ -50,7 +50,7 @@ const TabNavigator = () => {
         tabBarIcon: ({focused}) => {
           return(
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              <AntDesign name="heart" size={24} color={focused ? "red" : "#008080"} />
+              <AntDesign name="table" size={24} color={focused ? "red" : "#008080"} />
           </View>
           )
         }

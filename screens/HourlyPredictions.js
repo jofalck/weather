@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  SectionList,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState, useEffect } from "react";
@@ -19,6 +20,56 @@ import { forcastImgApi } from "../constVar/const";
 import * as Location from "expo-location";
 import MainBackgroundImage from "../components/background";
 
+const apiExample = require('../constVar/forcast_example_responsebody.json');
+
+// import DATA from '../constVar/forcast_example_responsebody.json';
+
+const currentTimeEpoch = apiExample.location.localtime_epoch;
+
+var DATA = [
+    {
+        title: '',
+        data: []
+    },
+    {
+        title: '',
+        data: []
+    },
+    {
+        title: '',
+        data: []
+    }
+];
+
+for (let i = 0; i < 3; i++) {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const in2Days = new Date(today);
+    in2Days.setDate(in2Days.getDate() + 2);
+    
+    DATA[i].title = i === 0 ? 'Today, ' + today.toLocaleDateString() : i === 1 ? 'Tomorrow, ' + tomorrow.toLocaleDateString() : 'In 2 days, ' + in2Days.toLocaleDateString();
+    
+    for (const hour of Object.keys(apiExample.forecast.forecastday[i].hour)) {
+        
+        const timeEpoch = apiExample.forecast.forecastday[i].hour[hour].time_epoch;
+        const time = new Date(timeEpoch * 1000).getHours();
+        // const weatherIcon = apiExample.forecast.forecastday[i].hour[hour].condition.icon;
+        const weatherDescription = apiExample.forecast.forecastday[i].hour[hour].condition.text;
+        const temperature_c = apiExample.forecast.forecastday[i].hour[hour].temp_c;
+        // const temperature_f = apiExample.forecast.forecastday[i].hour[hour].temp_f;
+        const precipitation = apiExample.forecast.forecastday[i].hour[hour].precip_mm;
+        const wind = apiExample.forecast.forecastday[i].hour[hour].wind_kph;
+        
+        if (apiExample.forecast.forecastday[i].hour[hour].time_epoch > currentTimeEpoch) {
+            DATA[i].data.push([time, weatherDescription, temperature_c, precipitation, wind].join(' - '));
+        }
+    }
+}
+
+console.log("DATA: ", DATA);
+
+
 const HourlyPredictions = () => {
   const [showSearch, toogleSearch] = useState(false);
   const [position, setPosition] = useState([]);
@@ -26,6 +77,7 @@ const HourlyPredictions = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleLocation = (loc) => {
+    console.log("handleLocation called");
     setIsLoading(true);
     console.log("Location:", loc);
     setPosition([]);
@@ -40,22 +92,23 @@ const HourlyPredictions = () => {
       console.log("the forcast is ", data);
     });
   };
-
+  
   const handleLocationSearch = (value) => {
     console.log("handleLocationSearch called. Location search: ", value);
+    console.log("apiExample:", apiExample.forecast.forecastday);
     if (value.length > 2) {
       fetchLocation({ cityLocation: value })
-        .then((data) => {
-          setPosition(data);
-          setIsLoading(false);
-          /* console.log("Location data: ", data); */
-        })
-        .catch((error) => {
-          console.error("Error fetching location: ", error);
-        });
+      .then((data) => {
+        setPosition(data);
+        setIsLoading(false);
+        /* console.log("Location data: ", data); */
+      })
+      .catch((error) => {
+        console.error("Error fetching location: ", error);
+      });
     }
   };
-
+  
   const fetchCurrentLocationAndForcast = async () => {
     console.log("fetchCurrentLocationAndForcast called");
     try {
@@ -196,50 +249,29 @@ const HourlyPredictions = () => {
                   className="w-48 h-48"
                 />
               </View>
-              {/* Celcius */}
-              <View className="space-y-2">
-                <Text className="text-center font-bold text-white text-6xl ml-5">
-                  {current?.temp_c}&#176;
-                </Text>
-                <Text className="text-center text-white text-xl tracking-widest">
-                  {current?.condition?.text}
-                </Text>
-              </View>
-              {/* Small stats */}
-              <View className="flex-row justify-between mx-0">
-                <View className="flex-row space-x-2 items-center">
-                  <Image
-                    source={require("../assets/statsIcons/uv.png")}
-                    className="h-5 w-5"
-                  />
-                  <Text className="text-white font-semibold text-justify">
-                    {current?.uv} UV
-                  </Text>
 
-                  <Image
-                    source={require("../assets/statsIcons/drop.png")}
-                    className="h-5 w-5"
-                    
-                  />
-                  <Text className="text-white font-semibold text-justify">
-                    {current?.humidity} %
-                  </Text>
-                  <Image
-                    source={require("../assets/statsIcons/sunrise.png")}
-                    className="h-5 w-5"
-                  />
-                  <Text className="text-white font-semibold text-justify">
-                    Put my text here.
-                  </Text>
-                  <Image
-                    source={require("../assets/statsIcons/sunset.png")}
-                    className="h-5 w-5"
-                  />
-                  <Text className="text-white font-semibold text-justify">
-                    Hey this is text. 
-                  </Text>
-                </View>
-              </View>
+              
+              {/* Table with predictions */}
+              <SectionList
+                sections={DATA}
+                keyExtractor={(item, index) => item + index}
+                renderItem={({item}) => (
+                  <View >
+                    <Text >{item}</Text>
+                  </View>
+                )}
+                renderSectionHeader={({section: {title}}) => (
+                  <Text 
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: 20,
+                    }}
+                  >{title}</Text>
+                )}
+              />
+
+              {/* Small stats */}
+
             </View>
 
 

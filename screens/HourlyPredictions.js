@@ -13,52 +13,82 @@ import React, { useCallback, useState, useEffect } from "react";
 import { MagnifyingGlassCircleIcon } from "react-native-heroicons/outline";
 import { MapPinIcon } from "react-native-heroicons/outline";
 import { debounce } from "lodash";
-import { fetchForcast, fetchLocation } from "../api/forcast";
+import { fetchForcast, fetchHourlyForcast, fetchLocation } from "../api/forcast";
 import * as Location from "expo-location";
 import MainBackgroundImage from "../components/background";
 
-const apiExample = require('../constVar/forcast_example_responsebody.json');
-const currentTimeEpoch = apiExample.location.localtime_epoch;
-var DATA = [
+const generateData = (apiResponse) => {
+  const currentTimeEpoch = apiResponse.location.localtime_epoch;
+
+  const DATA = [
     {
-        title: '',
-        data: []
+      title: '',
+      data: []
     },
     {
-        title: '',
-        data: []
+      title: '',
+      data: []
     },
     {
-        title: '',
-        data: []
+      title: '',
+      data: []
     }
-];
-for (let i = 0; i < 3; i++) {
+  ];
+
+  for (let i = 0; i < 3; i++) {
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const in2Days = new Date(today);
     in2Days.setDate(in2Days.getDate() + 2);
-    
+
     DATA[i].title = i === 0 ? 'Today, ' + today.toLocaleDateString() : i === 1 ? 'Tomorrow, ' + tomorrow.toLocaleDateString() : 'In 2 days, ' + in2Days.toLocaleDateString();
-    
-    for (const hour of Object.keys(apiExample.forecast.forecastday[i].hour)) {
-        
-        const timeEpoch = apiExample.forecast.forecastday[i].hour[hour].time_epoch;
-        const time = new Date(timeEpoch * 1000).getHours();
-        const weatherIcon = apiExample.forecast.forecastday[i].hour[hour].condition.icon;
-        const weatherDescription = apiExample.forecast.forecastday[i].hour[hour].condition.text;
-        const temperature_c = apiExample.forecast.forecastday[i].hour[hour].temp_c;
-        // const temperature_f = apiExample.forecast.forecastday[i].hour[hour].temp_f;
-        const precipitation = apiExample.forecast.forecastday[i].hour[hour].precip_mm;
-        const wind = apiExample.forecast.forecastday[i].hour[hour].wind_kph;
-        
-        if (apiExample.forecast.forecastday[i].hour[hour].time_epoch > currentTimeEpoch) {
-            DATA[i].data.push([("0" + time).slice(-2), weatherIcon, temperature_c, precipitation, wind]);
+
+    for (const hour of Object.keys(apiResponse.forecast.forecastday[i].hour)) {
+
+      const timeEpoch = apiResponse.forecast.forecastday[i].hour[hour].time_epoch;
+      const time = new Date(timeEpoch * 1000).getHours();
+      const weatherIcon = apiResponse.forecast.forecastday[i].hour[hour].condition.icon;
+      const weatherDescription = apiResponse.forecast.forecastday[i].hour[hour].condition.text;
+      const temperature_c = apiResponse.forecast.forecastday[i].hour[hour].temp_c;
+      // const temperature_f = apiResponse.forecast.forecastday[i].hour[hour].temp_f;
+      const precipitation = apiResponse.forecast.forecastday[i].hour[hour].precip_mm;
+      const wind = apiResponse.forecast.forecastday[i].hour[hour].wind_kph;
+      const wind_dir = apiResponse.forecast.forecastday[i].hour[hour].wind_dir.slice(-2);
+
+      const getWindDirectionIcon = (windDir) => {
+        switch (windDir) {
+          case "N":
+            return "↑";
+          case "NE":
+            return "↗";
+          case "E":
+            return "→";
+          case "SE":
+            return "↘";
+          case "S":
+            return "↓";
+          case "SW":
+            return "↙";
+          case "W":
+            return "←";
+          case "NW":
+            return "↖";
+          default:
+            return "";
         }
+      };
+
+      const windDirectionIcon = getWindDirectionIcon(wind_dir);
+
+      if (apiResponse.forecast.forecastday[i].hour[hour].time_epoch > currentTimeEpoch) {
+        DATA[i].data.push([("0" + time).slice(-2), weatherIcon, temperature_c, precipitation, wind + windDirectionIcon]);
+      }
     }
-}
-console.log("DATA: ", DATA);
+  }
+
+  return DATA;
+};
 
 
 const HourlyPredictions = () => {
@@ -66,6 +96,7 @@ const HourlyPredictions = () => {
   const [position, setPosition] = useState([]);
   const [Myforcast, setMyForcast] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [DATA, setDATA] = useState([]);
 
   const handleLocation = (loc) => {
     console.log("handleLocation called");
@@ -138,6 +169,11 @@ const HourlyPredictions = () => {
       });
       console.log("Forcast data: ", data);
       setMyForcast(data);
+      const hourlyData = await fetchHourlyForcast({
+        cityLocation: `${latitude},${longitude}`,
+      });
+      console.log("Hourly forcast data: ", hourlyData);
+      setDATA(generateData(hourlyData));
     } catch (error) {
       console.error("Error during fetching data: ", error);
     } finally {

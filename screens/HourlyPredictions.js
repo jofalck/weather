@@ -1,7 +1,6 @@
 import {
   Image,
   SafeAreaView,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -13,19 +12,13 @@ import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState, useEffect } from "react";
 import { MagnifyingGlassCircleIcon } from "react-native-heroicons/outline";
 import { MapPinIcon } from "react-native-heroicons/outline";
-import { CalendarDaysIcon } from "react-native-heroicons/solid";
 import { debounce } from "lodash";
 import { fetchForcast, fetchLocation } from "../api/forcast";
-import { forcastImgApi } from "../constVar/const";
 import * as Location from "expo-location";
 import MainBackgroundImage from "../components/background";
 
 const apiExample = require('../constVar/forcast_example_responsebody.json');
-
-// import DATA from '../constVar/forcast_example_responsebody.json';
-
 const currentTimeEpoch = apiExample.location.localtime_epoch;
-
 var DATA = [
     {
         title: '',
@@ -40,7 +33,6 @@ var DATA = [
         data: []
     }
 ];
-
 for (let i = 0; i < 3; i++) {
     const today = new Date();
     const tomorrow = new Date(today);
@@ -54,7 +46,7 @@ for (let i = 0; i < 3; i++) {
         
         const timeEpoch = apiExample.forecast.forecastday[i].hour[hour].time_epoch;
         const time = new Date(timeEpoch * 1000).getHours();
-        // const weatherIcon = apiExample.forecast.forecastday[i].hour[hour].condition.icon;
+        const weatherIcon = apiExample.forecast.forecastday[i].hour[hour].condition.icon;
         const weatherDescription = apiExample.forecast.forecastday[i].hour[hour].condition.text;
         const temperature_c = apiExample.forecast.forecastday[i].hour[hour].temp_c;
         // const temperature_f = apiExample.forecast.forecastday[i].hour[hour].temp_f;
@@ -62,11 +54,10 @@ for (let i = 0; i < 3; i++) {
         const wind = apiExample.forecast.forecastday[i].hour[hour].wind_kph;
         
         if (apiExample.forecast.forecastday[i].hour[hour].time_epoch > currentTimeEpoch) {
-            DATA[i].data.push([time, weatherDescription, temperature_c, precipitation, wind].join(' - '));
+            DATA[i].data.push([("0" + time).slice(-2), weatherIcon, temperature_c, precipitation, wind]);
         }
     }
 }
-
 console.log("DATA: ", DATA);
 
 
@@ -95,7 +86,6 @@ const HourlyPredictions = () => {
   
   const handleLocationSearch = (value) => {
     console.log("handleLocationSearch called. Location search: ", value);
-    console.log("apiExample:", apiExample.forecast.forecastday);
     if (value.length > 2) {
       fetchLocation({ cityLocation: value })
       .then((data) => {
@@ -242,35 +232,66 @@ const HourlyPredictions = () => {
                   {" " + location?.country}
                 </Text>
               </Text>
-              {/* Weather Image */}
-              <View className="flex-row justify-center">
-                <Image
-                  source={forcastImgApi[current?.condition?.text]}
-                  className="w-48 h-48"
-                />
-              </View>
 
               
               {/* Table with predictions */}
               <SectionList
+                stickySectionHeadersEnabled={true}
+
                 sections={DATA}
                 keyExtractor={(item, index) => item + index}
-                renderItem={({item}) => (
-                  <View >
-                    <Text >{item}</Text>
+                renderItem={({item, index}) => (
+                  <View style={{ 
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: index % 2 === 0 ? "#FAC5A2" : "lightgray"
+                  }}>
+                    <Text style={{ flex: 1, textAlign: "center" }}>{item[0]}</Text>
+                    <Image
+                      source={{ uri: `https:${item[1]}` }}
+                      style={{ width: 25, height: 25 }}
+                    />
+                    <Text style={{ flex: 1, textAlign: "center" }}>{item[2]}</Text>
+                    <Text style={{ flex: 1, textAlign: "center" }}>{item[3]}</Text>
+                    <Text style={{ flex: 1, textAlign: "center" }}>{item[4]}</Text>
                   </View>
                 )}
                 renderSectionHeader={({section: {title}}) => (
-                  <Text 
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: 20,
-                    }}
-                  >{title}</Text>
+                  <View>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: 20,
+                        backgroundColor: '#E7AA8C',
+                        padding: 10,
+                        borderRadius: 5,
+                        color: 'white',
+                        textAlign: 'center',
+                        marginTop: 10,
+                      }}
+                    >
+                      {title}
+                    </Text>
+                    <View 
+                      style={{ 
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        backgroundColor: "lightblue",
+                      }}
+                    >
+                      <Text style={{ flex: 1, textAlign: "center" }}>Time</Text>
+                      <Text style={{ flex: 2, textAlign: "center" }}>Temp(°C)</Text>
+                      <Text style={{ flex: 1, textAlign: "center" }}>Rain(mm)</Text>
+                      <Text style={{ flex: 1, textAlign: "center" }}>Wind(kph)</Text>
+                    </View>
+
+                  </View>
+
                 )}
               />
 
-              {/* Small stats */}
 
             </View>
 

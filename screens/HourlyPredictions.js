@@ -113,6 +113,13 @@ const HourlyPredictions = () => {
       setIsLoading(false);
       console.log("the forcast is ", data);
     });
+    fetchHourlyForcast({
+      cityLocation: loc.name,
+    }).then((data) => {
+      setDATA(generateData(data));
+      setIsLoading(false);
+      console.log("the hourly forcast is ", data);
+    });
   };
   
   const handleLocationSearch = (value) => {
@@ -319,7 +326,7 @@ const HourlyPredictions = () => {
                     >
                       <Text style={{ flex: 1, textAlign: "center" }}>Time</Text>
                       <Text style={{ flex: 2, textAlign: "center" }}>Temp(°C)</Text>
-                      <Text style={{ flex: 1, textAlign: "center" }}>Rain(mm)</Text>
+                      <Text style={{ flex: 1, textAlign: "center" }}>Rain (mm)</Text>
                       <Text style={{ flex: 1, textAlign: "center" }}>Wind(kph)</Text>
                     </View>
 

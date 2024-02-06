@@ -7,11 +7,13 @@ const apiExample = require('../constVar/forcast_example_responsebody.json');
 
 describe('generateData', () => {
   it('should generate the correct data array', () => {
-    const apiResponse = apiExample; // Replace with your own API response
+    const apiResponse = apiExample; 
+
+    const currentTimeEpoch = apiResponse.location.localtime_epoch;
 
     const expectedData = [
       {
-        title: 'Today, 5.2.2024' ,
+        title: 'Today, 4.2.2024' ,
         data: [["10","//cdn.weatherapi.com/weather/64x64/day/113.png",9.2,0,"3.2↙"]
         ,["11", "//cdn.weatherapi.com/weather/64x64/day/113.png", 10.6, 0, "3.2↙"]
       ,["12", "//cdn.weatherapi.com/weather/64x64/day/113.png", 11.8, 0, "3.6↙"],
@@ -29,7 +31,7 @@ describe('generateData', () => {
 ]
       },
       {
-        title: 'Tomorrow, 6.2.2024',
+        title: 'Tomorrow, 5.2.2024',
         data: [
           [ "00", "//cdn.weatherapi.com/weather/64x64/night/113.png", 8.6, 0, "7.2↙" ],
           [ "01", "//cdn.weatherapi.com/weather/64x64/night/113.png", 8.3, 0, "6.8↙" ],
@@ -59,7 +61,7 @@ describe('generateData', () => {
 
       },
       {
-        title: 'In 2 days, 7.2.2024' ,
+        title: 'In 2 days, 6.2.2024' ,
         data: [
           ["00", "//cdn.weatherapi.com/weather/64x64/night/119.png", 9.1, 0, "2.5→"],
           ["01", "//cdn.weatherapi.com/weather/64x64/night/119.png", 8.8, 0, "2.9↘"],

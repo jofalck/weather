@@ -36,11 +36,13 @@ export const generateData = (apiResponse) => {
   ];
 
   for (let i = 0; i < 3; i++) {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const in2Days = new Date(today);
-    in2Days.setDate(in2Days.getDate() + 2);
+    const todayEpoch = apiResponse.forecast.forecastday[0].date_epoch;
+    const tomorrowEpoch = apiResponse.forecast.forecastday[1].date_epoch;
+    const in2DaysEpoch = apiResponse.forecast.forecastday[2].date_epoch;
+
+    const today = new Date(todayEpoch * 1000);
+    const tomorrow = new Date(tomorrowEpoch * 1000);
+    const in2Days = new Date(in2DaysEpoch * 1000);
 
     DATA[i].title = i === 0 ? 'Today, ' + today.toLocaleDateString() : i === 1 ? 'Tomorrow, ' + tomorrow.toLocaleDateString() : 'In 2 days, ' + in2Days.toLocaleDateString();
 

@@ -17,7 +17,7 @@ import { fetchForcast, fetchHourlyForcast, fetchLocation } from "../api/forcast"
 import * as Location from "expo-location";
 import MainBackgroundImage from "../components/background";
 
-const generateData = (apiResponse) => {
+export const generateData = (apiResponse) => {
   const currentTimeEpoch = apiResponse.location.localtime_epoch;
 
   const DATA = [
@@ -280,7 +280,6 @@ const HourlyPredictions = () => {
               {/* Table with predictions */}
               <SectionList
                 stickySectionHeadersEnabled={true}
-
                 sections={DATA}
                 keyExtractor={(item, index) => item + index}
                 renderItem={({item, index}) => (
@@ -288,7 +287,9 @@ const HourlyPredictions = () => {
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    backgroundColor: index % 2 === 0 ? "#FAC5A2" : "lightgray"
+                    backgroundColor: index % 2 === 0 ? "#FAC5A2" : "lightgray",
+                    borderRadius: 20,
+                    padding: 3,
                   }}>
                     <Text style={{ flex: 1, textAlign: "center" }}>{item[0]}</Text>
                     <Image
@@ -308,7 +309,7 @@ const HourlyPredictions = () => {
                         fontSize: 20,
                         backgroundColor: '#E7AA8C',
                         padding: 10,
-                        borderRadius: 5,
+                        borderRadius: 130,
                         color: 'white',
                         textAlign: 'center',
                         marginTop: 10,
@@ -322,6 +323,7 @@ const HourlyPredictions = () => {
                         justifyContent: "space-between",
                         alignItems: "center",
                         backgroundColor: "lightblue",
+                        borderRadius: 30,
                       }}
                     >
                       <Text style={{ flex: 1, textAlign: "center" }}>Time</Text>
@@ -334,11 +336,7 @@ const HourlyPredictions = () => {
 
                 )}
               />
-
-
             </View>
-
-
           </SafeAreaView>
         </View>
       )}

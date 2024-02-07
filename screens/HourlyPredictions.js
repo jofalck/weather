@@ -286,9 +286,13 @@ const HourlyPredictions = () => {
                 renderItem={({item, index}) => (
                   <View style={{ 
                     flexDirection: "row",
-                    justifyContent: "space-between",
+                    justifyContent: "space-evenly",
                     alignItems: "center",
-                    backgroundColor: index % 2 === 0 ? "#FAC5A2" : "lightgray"
+                    borderRadius: 1,
+                    backgroundColor: index % 2 === 0 ? "#F0F4F8" : "#FFFFFF", // Lighter colors for better readability
+                    padding: 12, // Increased padding for a spacious look
+                    borderBottomWidth: 3, // Subtle borders between rows
+                    borderColor: "#E1E4E8", // Soft color for borders
                   }}>
                     <Text style={{ flex: 1, textAlign: "center" }}>{item[0]}</Text>
                     <Image
@@ -302,32 +306,36 @@ const HourlyPredictions = () => {
                 )}
                 renderSectionHeader={({section: {title}}) => (
                   <View>
-                    <Text
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: 20,
-                        backgroundColor: '#E7AA8C',
-                        padding: 10,
-                        borderRadius: 5,
-                        color: 'white',
-                        textAlign: 'center',
-                        marginTop: 10,
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: 18,
+                      color: 'white',
+                      marginTop:20,
+                      padding: 10,
+                      textAlign: 'center',
+                      marginVertical: 0,
+                      backgroundColor: '#4D96FF', // A pleasant shade of blue
+                      padding: 16, // Uniform padding
+                      marginTop: 0, // Space above the header
+                    }}
+                  >
+                    {title}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      backgroundColor: "#7F9FDF", // Lighter shade of blue
+                      marginBottom: 2,
+                      paddingVertical: 10,
                       }}
-                    >
-                      {title}
-                    </Text>
-                    <View 
-                      style={{ 
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        backgroundColor: "lightblue",
-                      }}
-                    >
-                      <Text style={{ flex: 1, textAlign: "center" }}>Time</Text>
-                      <Text style={{ flex: 2, textAlign: "center" }}>Temp(°C)</Text>
-                      <Text style={{ flex: 1, textAlign: "center" }}>Rain (mm)</Text>
-                      <Text style={{ flex: 1, textAlign: "center" }}>Wind(kph)</Text>
+                  >
+                      <Text style={{ flex: 1, textAlign: "center", color: "white", }}>Time</Text>
+                      <Text style={{ flex: 2, textAlign: "center", color: "white",  }}>Temp(°C)</Text>
+                      <Text style={{ flex: 1, textAlign: "center", color: "white", }}>Rain (mm)</Text>
+                      <Text style={{ flex: 1, textAlign: "center", color: "white", }}>Wind(kph)</Text>
                     </View>
 
                   </View>

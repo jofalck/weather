@@ -1,7 +1,4 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
-import HourlyPredictions from '../screens/HourlyPredictions';
-import { generateData } from "../screens/HourlyPredictions";
+import { generateData } from "../utils/predictionTableData";
 
 const apiExample = require('../constVar/forcast_example_responsebody.json');
 

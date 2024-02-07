@@ -1,12 +1,10 @@
 import {
-  Image,
   SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
   ActivityIndicator,
-  SectionList,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState, useEffect } from "react";
@@ -16,82 +14,8 @@ import { debounce } from "lodash";
 import { fetchForcast, fetchHourlyForcast, fetchLocation } from "../api/forcast";
 import * as Location from "expo-location";
 import MainBackgroundImage from "../components/background";
-
-export const generateData = (apiResponse) => {
-  const currentTimeEpoch = apiResponse.location.localtime_epoch;
-
-  const DATA = [
-    {
-      title: '',
-      data: []
-    },
-    {
-      title: '',
-      data: []
-    },
-    {
-      title: '',
-      data: []
-    }
-  ];
-
-  for (let i = 0; i < 3; i++) {
-    const todayEpoch = apiResponse.forecast.forecastday[0].date_epoch;
-    const tomorrowEpoch = apiResponse.forecast.forecastday[1].date_epoch;
-    const in2DaysEpoch = apiResponse.forecast.forecastday[2].date_epoch;
-
-    const today = new Date(todayEpoch * 1000);
-    const tomorrow = new Date(tomorrowEpoch * 1000);
-    const in2Days = new Date(in2DaysEpoch * 1000);
-
-    DATA[i].title = i === 0 ? 'Today, ' + today.toLocaleDateString() : i === 1 ? 'Tomorrow, ' + tomorrow.toLocaleDateString() : 'In 2 days, ' + in2Days.toLocaleDateString();
-
-    for (const hour of Object.keys(apiResponse.forecast.forecastday[i].hour)) {
-
-      const timeEpoch = apiResponse.forecast.forecastday[i].hour[hour].time_epoch;
-      const time = new Date(timeEpoch * 1000).getHours();
-      const weatherIcon = apiResponse.forecast.forecastday[i].hour[hour].condition.icon;
-      const weatherDescription = apiResponse.forecast.forecastday[i].hour[hour].condition.text;
-      const temperature_c = apiResponse.forecast.forecastday[i].hour[hour].temp_c;
-      // const temperature_f = apiResponse.forecast.forecastday[i].hour[hour].temp_f;
-      const precipitation = apiResponse.forecast.forecastday[i].hour[hour].precip_mm;
-      const wind = apiResponse.forecast.forecastday[i].hour[hour].wind_kph;
-      const wind_dir = apiResponse.forecast.forecastday[i].hour[hour].wind_dir.slice(-2);
-
-      const getWindDirectionIcon = (windDir) => {
-        switch (windDir) {
-          case "N":
-            return "↑";
-          case "NE":
-            return "↗";
-          case "E":
-            return "→";
-          case "SE":
-            return "↘";
-          case "S":
-            return "↓";
-          case "SW":
-            return "↙";
-          case "W":
-            return "←";
-          case "NW":
-            return "↖";
-          default:
-            return "";
-        }
-      };
-
-      const windDirectionIcon = getWindDirectionIcon(wind_dir);
-
-      if (apiResponse.forecast.forecastday[i].hour[hour].time_epoch > currentTimeEpoch) {
-        DATA[i].data.push([("0" + time).slice(-2), weatherIcon, temperature_c, precipitation, wind + windDirectionIcon]);
-      }
-    }
-  }
-
-  return DATA;
-};
-
+import PredictionTable from "../components/predictionTable";
+import { generateData } from "../utils/predictionTableData";
 
 const HourlyPredictions = () => {
   const [showSearch, toogleSearch] = useState(false);
@@ -131,7 +55,6 @@ const HourlyPredictions = () => {
       .then((data) => {
         setPosition(data);
         setIsLoading(false);
-        /* console.log("Location data: ", data); */
       })
       .catch((error) => {
         console.error("Error fetching location: ", error);
@@ -206,7 +129,7 @@ const HourlyPredictions = () => {
         <View className="flex-1 relative">
           <StatusBar style="light" />
           <MainBackgroundImage />
-          {/* Seacrh bar */}
+          {/* Search bar */}
           <SafeAreaView className="flex flex-1">
             <View
               className="relative z-50"
@@ -276,68 +199,8 @@ const HourlyPredictions = () => {
                 <Text className="text-lg font-semibold text-gray-200">
                   {" " + location?.country}
                 </Text>
-              </Text>
-
-              
-              {/* Table with predictions */}
-              <SectionList
-                stickySectionHeadersEnabled={true}
-                sections={DATA}
-                keyExtractor={(item, index) => item + index}
-                renderItem={({item, index}) => (
-                  <View style={{ 
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    backgroundColor: index % 2 === 0 ? "#FAC5A2" : "lightgray",
-                    borderRadius: 20,
-                    padding: 3,
-                  }}>
-                    <Text style={{ flex: 1, textAlign: "center" }}>{item[0]}</Text>
-                    <Image
-                      source={{ uri: `https:${item[1]}` }}
-                      style={{ width: 25, height: 25 }}
-                    />
-                    <Text style={{ flex: 1, textAlign: "center" }}>{item[2]}</Text>
-                    <Text style={{ flex: 1, textAlign: "center" }}>{item[3]}</Text>
-                    <Text style={{ flex: 1, textAlign: "center" }}>{item[4]}</Text>
-                  </View>
-                )}
-                renderSectionHeader={({section: {title}}) => (
-                  <View>
-                    <Text
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: 20,
-                        backgroundColor: '#E7AA8C',
-                        padding: 10,
-                        borderRadius: 130,
-                        color: 'white',
-                        textAlign: 'center',
-                        marginTop: 10,
-                      }}
-                    >
-                      {title}
-                    </Text>
-                    <View 
-                      style={{ 
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        backgroundColor: "lightblue",
-                        borderRadius: 30,
-                      }}
-                    >
-                      <Text style={{ flex: 1, textAlign: "center" }}>Time</Text>
-                      <Text style={{ flex: 2, textAlign: "center" }}>Temp(°C)</Text>
-                      <Text style={{ flex: 1, textAlign: "center" }}>Rain (mm)</Text>
-                      <Text style={{ flex: 1, textAlign: "center" }}>Wind(kph)</Text>
-                    </View>
-
-                  </View>
-
-                )}
-              />
+              </Text>              
+              <PredictionTable DATA={DATA} />
             </View>
           </SafeAreaView>
         </View>

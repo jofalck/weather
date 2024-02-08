@@ -72,6 +72,10 @@ const LoginScreen = () => {
         source={require("../assets/image/logo.png")}
         style={{ position: "relative", height: "30%", width: "70%" }}
       />
+        <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <Text style={{ fontSize: 42, fontWeight: 'bold', textDecorationLine: "underline", margin: 10 , color: 'white' }}>WeatherWISE</Text>
+        </View>
+
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="  Email"

@@ -199,8 +199,7 @@ const HourlyPredictions = () => {
                 <Text className="text-lg font-semibold text-gray-200">
                   {" " + location?.country}
                 </Text>
-              </Text>              
-              <PredictionTable DATA={DATA} />
+
             </View>
           </SafeAreaView>
         </View>

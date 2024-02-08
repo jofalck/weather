@@ -10,6 +10,9 @@ export const forcastImgApi = {
     'Cloudy': require('../assets/image/cloud.png'),
     'Light rain': require('../assets/image/moderaterain.png'),
     'Light snow': require('../assets/image/snow.png'),
+    'Heavy snow': require('../assets/image/snow.png'),
+    'Snow': require('../assets/image/snow.png'),
+    'scattered clouds': require('../assets/image/cloud.png'),
     'Moderate rain at time': require('../assets/image/moderaterain.png'),
     'Heavy rain': require('../assets/image/heavyrain.png'),
     'Heavy rain at time': require('../assets/image/heavyrain.png'),
@@ -17,5 +20,6 @@ export const forcastImgApi = {
     'Moderate or heavy rain shower': require('../assets/image/heavyrain.png'),
     'Moderate or heavy rain with thunder': require('../assets/image/heavyrain.png'),
     'Mist': require('../assets/image/mist.png'),
+    'Fog': require('../assets/image/mist.png'),
     'other': require('../assets/image/moderaterain.png')
 }

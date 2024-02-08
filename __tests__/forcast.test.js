@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { fetchForcast, fetchLocation } from '../api/forcast.js';
+import { fetchForcast, fetchLocation, fetchHourlyForcast } from '../api/forcast.js';
 import { apikey } from "../constVar/const.js";
 
 
@@ -93,4 +93,40 @@ describe('fetchLocation', () => {
         expect(result).toBeNull();
         expect(console.log).toHaveBeenCalledWith('error: ' + error);
     });
+});describe('fetchHourlyForcast', () => {
+  test('should make a GET request to the hourly forecast endpoint', async () => {
+    const cityLocation = 'Milan';
+    const hourlyForcastURL = `https://api.weatherapi.com/v1/forecast.json?key=${apikey}&q=${cityLocation}&days=3&aqi=no&alerts=no`;
+    const responseData = {
+      data: {},
+      status: 200,
+    };
+    axios.request.mockResolvedValueOnce(responseData);
+
+    const result = await fetchHourlyForcast({ cityLocation });
+
+    expect(axios.request).toHaveBeenCalledTimes(1);
+    expect(axios.request).toHaveBeenCalledWith({
+      method: 'GET',
+      url: hourlyForcastURL,
+    });
+    expect(result).toEqual(responseData.data);
+  });
+
+  test('should return null and log an error if the request fails', async () => {
+    const cityLocation = 'Rome';
+    const hourlyForcastURL = `https://api.weatherapi.com/v1/forecast.json?key=${apikey}&q=${cityLocation}&days=3&aqi=no&alerts=no`;
+    const error = new Error('Request failed');
+    axios.request.mockRejectedValueOnce(error);
+
+    const result = await fetchHourlyForcast({ cityLocation });
+
+    expect(axios.request).toHaveBeenCalledTimes(1);
+    expect(axios.request).toHaveBeenCalledWith({
+      method: 'GET',
+      url: hourlyForcastURL,
+    });
+    expect(result).toBeNull();
+    expect(console.log).toHaveBeenCalledWith('error: ' + error);
+  });
 });
